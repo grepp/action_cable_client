@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 # required gems
-require 'websocket-eventmachine-client'
+require 'em-websocket-client'
 require 'forwardable'
 require 'active_support/core_ext/string'
 require 'json'
@@ -45,7 +45,7 @@ class ActionCableClient
     #      https://github.com/mwylde/em-websocket-client/blob/master/lib/em-websocket-client.rb
     #   is a subclass of
     #      https://github.com/eventmachine/eventmachine/blob/master/lib/em/connection.rb
-    @_websocket_client = WebSocket::EventMachine::Client.connect(uri: _uri, headers: _headers)
+    @_websocket_client = EventMachine::WebSocketClient.connect(_uri, headers: _headers)
   end
 
   # @param [String] action - how the message is being sent
