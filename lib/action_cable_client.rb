@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 # required gems
-require 'em-websocket-client'
+require 'websocket-eventmachine-client'
 require 'forwardable'
 require 'active_support/core_ext/string'
 require 'json'
@@ -17,7 +17,7 @@ class ActionCableClient
     MESSAGE = 'message'
   end
 
-  attr_reader :_websocket_client, :_uri, :_channel_name, :_queued_send
+  attr_reader :_websocket_client, :_uri, :_headers, :_channel_name, :_queued_send
   attr_reader :_message_factory
   # The queue should store entries in the format:
   # [ action, data ]
@@ -31,9 +31,10 @@ class ActionCableClient
   #                           e.g.: RoomChannel
   # @param [Boolean] queued_send - optionally send messages after a ping
   #                                is received, rather than instantly
-  def initialize(uri, channel = '', queued_send = false)
+  def initialize(uri, headers = {}, channel = '', queued_send = false)
     @_channel_name = channel
     @_uri = uri
+    @_headers = headers
     @_queued_send = queued_send
     @message_queue = []
     @_subscribed = false
@@ -44,7 +45,7 @@ class ActionCableClient
     #      https://github.com/mwylde/em-websocket-client/blob/master/lib/em-websocket-client.rb
     #   is a subclass of
     #      https://github.com/eventmachine/eventmachine/blob/master/lib/em/connection.rb
-    @_websocket_client = EventMachine::WebSocketClient.connect(_uri)
+    @_websocket_client = WebSocket::EventMachine::Client.connect(uri: _uri, headers: _headers)
   end
 
   # @param [String] action - how the message is being sent
